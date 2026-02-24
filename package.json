@@ -1,0 +1,13 @@
+{
+  "name": "mmap-cli",
+  "version": "0.1.0",
+  "description": "Markmap HTML to PDF/PNG",
+  "license": "MIT",
+  "bin": {
+    "mmap": "./index.js"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "puppeteer": "^19.11.1"
+  }
+}
