@@ -35,31 +35,31 @@ npm install -g .
 
 1. **外部样式表依赖**：
    
-`markmap` 使用 CSS 来控制文字的字体（通常是系统的无衬线字体）、颜色和粗细。当你只导出 SVG 标签时，这些 CSS 留在 HTML 的 `<style>` 标签里了，SVG 失去了样式指引，文字可能变成了白色、透明或因高度塌陷而无法显示。
+   `markmap` 使用 CSS 来控制文字的字体（通常是系统的无衬线字体）、颜色和粗细。当你只导出 SVG 标签时，这些 CSS 留在 HTML 的 `<style>` 标签里了，SVG 失去了样式指引，文字可能变成了白色、透明或因高度塌陷而无法显示。
 
 2. **ForeignObject 兼容性**：
    
-Markmap 为了支持 Markdown 的丰富格式（如加粗、斜体、链接），在 SVG 中使用了 `<foreignObject>` 标签来嵌入 HTML。许多基础的 SVG 查看器或矢量绘图软件（如旧版 AI 或某些在线转换器）无法解析这种标签。
+   Markmap 为了支持 Markdown 的丰富格式（如加粗、斜体、链接），在 SVG 中使用了 `<foreignObject>` 标签来嵌入 HTML。许多基础的 SVG 查看器或矢量绘图软件（如旧版 AI 或某些在线转换器）无法解析这种标签。
 
-Markmap 的文字**不是**真正的 SVG 文字（`<text>`），而是包装在 `<foreignObject>` 标签里的 **标准 HTML `<div>**`。
+   Markmap 的文字**不是**真正的 SVG 文字（`<text>`），而是包装在 `<foreignObject>` 标签里的 **标准 HTML `<div>**`。
 
-* **浏览器的懒惰：** 浏览器渲染网页时，会自动计算 `div` 的宽高。但在 SVG 文件独立存在时，浏览器不会为 `foreignObject` 自动计算尺寸。如果属性里没有明确写死 `width="200" height="100"`，它在渲染时就会被当作 `0x0` 像素，导致文字“隐身”。
-* **兼容性断层：** 许多 SVG 查看器（甚至包括旧版的某些浏览器或特定的 Markdown 编辑器）根本不支持渲染 `foreignObject` 内部的 HTML 内容。
+      * **浏览器的懒惰：** 浏览器渲染网页时，会自动计算 `div` 的宽高。但在 SVG 文件独立存在时，浏览器不会为 `foreignObject` 自动计算尺寸。如果属性里没有明确写死 `width="200" height="100"`，它在渲染时就会被当作 `0x0` 像素，导致文字“隐身”。
+      * **兼容性断层：** 许多 SVG 查看器（甚至包括旧版的某些浏览器或特定的 Markdown 编辑器）根本不支持渲染 `foreignObject` 内部的 HTML 内容。
 
-2. **动画与生命周期冲突**：
+3. **动画与生命周期冲突**：
 
-Markmap 是动态生成的。从 Markdown 变成 SVG 经历了好几个阶段：
-`Markdown -> JSON -> D3 Layout -> KaTeX Render -> WebFont Load -> D3 Animation`。
-如果 Puppeteer 抓取的时间点不对（比如字体还没加载完，或者动画还在进行中），导出的 SVG 就会是空的或者错位的。
-   
-Markmap 是通过 D3.js 动态计算位置的。如果你在页面还没完全加载完成（计算完坐标）时就尝试提取代码，文字可能还没被填入 DOM 树。
+   Markmap 是动态生成的。从 Markdown 变成 SVG 经历了好几个阶段：
+   `Markdown -> JSON -> D3 Layout -> KaTeX Render -> WebFont Load -> D3 Animation`。
+   如果 Puppeteer 抓取的时间点不对（比如字体还没加载完，或者动画还在进行中），导出的 SVG 就会是空的或者错位的。
+      
+   Markmap 是通过 D3.js 动态计算位置的。如果你在页面还没完全加载完成（计算完坐标）时就尝试提取代码，文字可能还没被填入 DOM 树。
 
-2. KaTeX 与 CSS 的“解耦”
+4. KaTeX 与 CSS 的“解耦”
 
-你的思维导图里有公式，KaTeX 渲染公式依赖于大量的外部 CSS 样式和特殊的 **WebFonts（字体文件）**。
+   你的思维导图里有公式，KaTeX 渲染公式依赖于大量的外部 CSS 样式和特殊的 **WebFonts（字体文件）**。
 
-* 当你把 SVG 导出为独立文件时，它就失去了与页面上 `katex.min.css` 的联系。
-* 即便我们内联了 CSS，如果 SVG 文件找不到那些 `.woff2` 字体文件，公式就会变成一堆乱码或者奇怪的符号。
+   * 当你把 SVG 导出为独立文件时，它就失去了与页面上 `katex.min.css` 的联系。
+   * 即便我们内联了 CSS，如果 SVG 文件找不到那些 `.woff2` 字体文件，公式就会变成一堆乱码或者奇怪的符号。
 
 ### 导出的 SVG 图片用 Inkscape 打开时出现乱码
 
